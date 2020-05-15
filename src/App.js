@@ -39,6 +39,7 @@ function App() {
   function fileReadHandler(event){
     let csvData = event.target.result;
     let processedData = processCSVData(csvData);
+    
     setProcessedData(processedData);
   }
   
@@ -47,11 +48,14 @@ function App() {
   }
   
   function processCSVData(data){
-    let rows = data.split("\n");
+    
+    let rows = data.split(/\n|\r/);
+    
   
     const regex = /(?:,|\n|^)("(?:(?:"")*[^"]*)*"|[^",\n]*|(?:\n|$))/gm;
   
     let fields = rows[0].split(regex);
+    
   
     let formattedData = rows.slice(1).reduce((finalData, row) => {
       
@@ -64,6 +68,8 @@ function App() {
       }, {})
       return [...finalData, dataPoint]
     }, []);
+
+
   
     return formattedData
   }
@@ -71,7 +77,7 @@ function App() {
   return (
     <div className={!processedData ? 'wrapper' : 'table-wrapper' }>
       {!processedData ? <FileUpload className={"file-upload1"} handleFileUpload={handleFileUpload} label={'Upload Csv File'} /> : null}
-      {processedData ? (
+      {processedData && processedData[0] ? (
         <>
           <FileUpload className={"file-upload2"} handleFileUpload={handleFileUpload} label={'Upload Another File'} />
           <div className="button-container">
@@ -83,7 +89,7 @@ function App() {
             </button>
             <button
               onClick={() => setOffset(offset + limit)}
-              disabled={offset >= Object.keys(processedData[0]).length}
+              disabled={offset >=  Object.keys(processedData[0]).length}
             >
               Next
             </button>
